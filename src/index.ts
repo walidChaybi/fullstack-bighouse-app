@@ -25,7 +25,7 @@ app.post("/delete-listing", (req, res) => {
     }
   }
 
-  return res.send("failed to deleted listing");
+  return res.send("failed to deleted ");
 });
 
 app.listen(port);
