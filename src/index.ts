@@ -1,31 +1,23 @@
-import express from "express";
-import bodyParser from "body-parser";
-import { listings } from "./listings";
+require("dotenv").config();
 
-const app = express();
-const port = 9000;
+import express, { Application } from "express";
+import { ApolloServer } from "apollo-server-express";
+import { connectDatabase } from "./database";
+import { typeDefs, resolvers } from "./graphql/index";
 
-const one = 1;
-const two = 2;
+const mount = async (app: any) => {
+  const db = await connectDatabase();
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: () => ({ db }),
+  });
+  server.applyMiddleware({ app, path: "/api" });
 
-app.use(bodyParser.json());
+  app.listen(process.env.PORT);
 
-app.get("/", (_req, res) => res.send(`1 + 2 = ${one + two}`));
+  const listings = await db.listings.find({}).toArray();
+  console.log(listings);
+};
 
-app.get("/listings", (_req, res) => {
-  res.send(listings);
-});
-
-app.post("/delete-listing", (req, res) => {
-  const id: string = req.body.id;
-
-  for (let i = 0; i < listings.length; i++) {
-    if (listings[i].id === id) {
-      return res.send(listings.splice(i, 1)[0]);
-    }
-  }
-
-  return res.send("failed to deleted ");
-});
-
-app.listen(port);
+mount(express());
