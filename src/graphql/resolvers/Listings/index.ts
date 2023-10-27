@@ -1,8 +1,8 @@
-import { Database } from "../lib/types";
+import { Database, Listing } from "../../../lib/types";
 import { IResolvers } from "apollo-server-express";
 import { ObjectId } from "mongodb";
 
-export const resolvers: IResolvers = {
+export const listingResolvers: IResolvers = {
   Query: {
     listings: async (_root: undefined, _args: {}, { db }: { db: Database }) => {
       return await db.listings.find({}).toArray();
@@ -23,5 +23,8 @@ export const resolvers: IResolvers = {
       }
       return deleteRes;
     },
+  },
+  Listing: {
+    id: (listing: Listing) => listing._id.toString(),
   },
 };
